@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.searchclient.clientwrapper.domain.dto.SolrSearchResponseDTO;
-import com.searchclient.clientwrapper.domain.port.api.SolrSearchRecordsServicePort;
+import com.searchclient.clientwrapper.domain.dto.SearchResponse;
+import com.searchclient.clientwrapper.domain.port.api.SearchServicePort;
 
 
 @RestController
@@ -20,12 +20,11 @@ import com.searchclient.clientwrapper.domain.port.api.SolrSearchRecordsServicePo
 public class SearchCLResource {
     private final Logger logger = LoggerFactory.getLogger(SearchCLResource.class);
     @Autowired
-    SolrSearchRecordsServicePort solrSearchRecordsServicePort;
+    SearchServicePort solrSearchRecordsServicePort;
 
-    // http://localhost:<server.port>/saas-microservice-tester/test/get-all
 
     @GetMapping(value = "/{clientId}/{tableName}")
-    public ResponseEntity<SolrSearchResponseDTO> searchRecords(
+    public ResponseEntity<SearchResponse> searchRecords(
     		@PathVariable int clientId, 
     		@PathVariable String tableName, 
             @RequestParam(defaultValue = "*") String queryField, @RequestParam(defaultValue = "*") String searchTerm, 
@@ -34,8 +33,28 @@ public class SearchCLResource {
             @RequestParam(defaultValue = "id") String orderBy, @RequestParam(defaultValue = "asc") String order) {
         logger.debug("Egress CL tester REST call for records-search in the given table");
         
-        SolrSearchResponseDTO responseDTO = solrSearchRecordsServicePort.setUpSelectQueryAdvancedSearch(
-        		tableName, queryField, searchTerm, startRecord, pageSize, orderBy, order, null);
+        SearchResponse responseDTO = solrSearchRecordsServicePort.setUpSelectQuerySearchViaQueryField(
+        		clientId, tableName, queryField, searchTerm, startRecord, pageSize, orderBy, order, null);
+        
+        
+        return ResponseEntity
+        		.status(HttpStatus.OK)
+        		.body(responseDTO);
+    }
+    
+    
+    @GetMapping(value = "/query/{clientId}/{tableName}")
+    public ResponseEntity<SearchResponse> searchRecordsViaQuery(
+    		@PathVariable int clientId, 
+    		@PathVariable String tableName, 
+            @RequestParam(defaultValue = "*") String searchQuery, 
+            @RequestParam(defaultValue = "0") String startRecord,
+            @RequestParam(defaultValue = "5") String pageSize, 
+            @RequestParam(defaultValue = "id") String orderBy, @RequestParam(defaultValue = "asc") String order) {
+        logger.debug("Egress CL tester REST call for records-search via query in the given table");
+        
+        SearchResponse responseDTO = solrSearchRecordsServicePort.setUpSelectQuerySearchViaQuery(
+        		clientId, tableName, searchQuery, startRecord, pageSize, orderBy, order, null);
         
         
         return ResponseEntity
