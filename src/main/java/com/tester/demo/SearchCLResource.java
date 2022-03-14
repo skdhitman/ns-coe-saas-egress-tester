@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.searchclient.clientwrapper.domain.dto.SearchResponse;
+import com.searchclient.clientwrapper.domain.dto.logger.Loggers;
 import com.searchclient.clientwrapper.domain.port.api.SearchServicePort;
 
 
@@ -34,7 +35,7 @@ public class SearchCLResource {
         logger.debug("Egress CL tester REST call for records-search in the given table");
         
         SearchResponse responseDTO = solrSearchRecordsServicePort.setUpSelectQuerySearchViaQueryField(
-        		clientId, tableName, queryField, searchTerm, startRecord, pageSize, orderBy, order, null);
+        		clientId, tableName, queryField, searchTerm, startRecord, pageSize, orderBy, order, new Loggers());
         
         
         return ResponseEntity
@@ -54,7 +55,7 @@ public class SearchCLResource {
         logger.debug("Egress CL tester REST call for records-search via query in the given table");
         
         SearchResponse responseDTO = solrSearchRecordsServicePort.setUpSelectQuerySearchViaQuery(
-        		clientId, tableName, searchQuery, startRecord, pageSize, orderBy, order, null);
+        		clientId, tableName, searchQuery, startRecord, pageSize, orderBy, order, new Loggers());
         
         
         return ResponseEntity
